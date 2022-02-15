@@ -24,7 +24,7 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
- Nest Task Manager
+ Nest Task Manager api
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
