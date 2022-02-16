@@ -35,4 +35,3 @@ $ npm run test:cov
 ## License
 
 Nest is [MIT licensed](LICENSE).
->>>>>>> b8dc58b (initial commit)
