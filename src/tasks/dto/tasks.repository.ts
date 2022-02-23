@@ -22,8 +22,8 @@ export class TasksRepository extends Repository<Task> {
         return task;
     }
 
-    async deleteTask(id: string): Promise<boolean> {
-        const result = await this.delete(id);
+    async deleteTask(id: string, user: User): Promise<boolean> {
+        const result = await this.delete({id, user});
         if (result.affected === 0) {
             throw new NotFoundException(`Task with ID:"${id}" not found`);
         }
@@ -36,7 +36,7 @@ export class TasksRepository extends Repository<Task> {
         const query = this.createQueryBuilder('task');
         //only task of user logged
         query.where({ user });
-        
+
         if (status) {
             query.andWhere('task.status = :status', { status })
         }
@@ -48,8 +48,8 @@ export class TasksRepository extends Repository<Task> {
         return tasks;
     }
 
-    async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
-        const task = await this.findOne(id);
+    async updateTaskStatus(id: string, status: TaskStatus, user: User): Promise<Task> {
+        const task = await this.findOne({ where: { id: id, user: user } });
         task.status = status;
         await this.save(task);
         return task;
