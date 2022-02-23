@@ -6,18 +6,20 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTaskFilterDto } from './dto/get-tasks-filter.dto';
 import { Task } from './dto/task.entity';
 import { updateTaskStatusDto } from './dto/update-stask-status.dto';
-import { TaskStatus } from './task-status.enum';
 import { TasksService } from './tasks.service';
-
+import { Logger } from '@nestjs/common'
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
+  private logger = new Logger('taskController', {timestamp: true});
+
   constructor(private tasksService: TasksService) { }
 
   @Get()
   getTask(
     @Query() filterDto: GetTaskFilterDto,
     @GetUser() user: User): Promise<Task[]> {
+    this.logger.verbose(`User  "${user.username}", retrieving all task. Filters: ${JSON.stringify(filterDto)}`);
     return this.tasksService.getTasks(filterDto, user);
   }
 
@@ -43,7 +45,7 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: User,
   ): Promise<Task> {
-    // console.log('body', title, description);
+    this.logger.verbose(`User "${user.username}", create new task data: ${JSON.stringify(createTaskDto)}`);
     return this.tasksService.createTask(createTaskDto, user);
   }
 
@@ -54,6 +56,7 @@ export class TasksController {
     @GetUser() user: User,
   ): Promise<Task> {
     const { status } = updateTaskStatusDto;
+    this.logger.verbose(`User  "${user.username}", update status task "${id}"`);
     return this.tasksService.updateTaskStatus(id, status, user);
   }
 }
