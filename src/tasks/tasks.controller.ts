@@ -15,8 +15,10 @@ export class TasksController {
   constructor(private tasksService: TasksService) { }
 
   @Get()
-  getTask(@Query() filterDto: GetTaskFilterDto): Promise<Task[]> {
-    return this.tasksService.getTasks(filterDto);
+  getTask(
+    @Query() filterDto: GetTaskFilterDto,
+    @GetUser() user: User): Promise<Task[]> {
+    return this.tasksService.getTasks(filterDto, user);
   }
 
   @Get('/:id')
@@ -35,7 +37,7 @@ export class TasksController {
   createTask(
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: User,
-   ): Promise<Task> {
+  ): Promise<Task> {
     // console.log('body', title, description);
     return this.tasksService.createTask(createTaskDto, user);
   }
