@@ -1,25 +1,25 @@
 import { NotFoundException, Logger, InternalServerErrorException } from "@nestjs/common";
-import { timeStamp } from "console";
 import { User } from "../../auth/user.entity";
 import { EntityRepository, Repository } from "typeorm";
 import { TaskStatus } from "../task-status.enum";
 import { CreateTaskDto } from "./create-task.dto";
 import { GetTaskFilterDto } from "./get-tasks-filter.dto";
 import { Task } from "./task.entity";
-
+import { TaskCategory } from "../../tasks-category/dto/tasks-category.entity";
 
 @EntityRepository(Task)
 export class TasksRepository extends Repository<Task> {
     private logger = new Logger('taskRepository', { timestamp: true });
 
     async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
-        const { title, description } = createTaskDto;
+        const { title, description, taskCategory } = createTaskDto;
         try {
             const task = this.create({
                 title,
                 description,
                 status: TaskStatus.OPEN,
-                user: user
+                user: user,
+                taskCategory,
             });
             await this.save(task);
             return task;
@@ -42,7 +42,8 @@ export class TasksRepository extends Repository<Task> {
 
     async getTasks(filterDto: GetTaskFilterDto, user: User): Promise<Task[]> {
         const { status, search } = filterDto;
-        const query = this.createQueryBuilder('task');
+        //typeorm query to extract category of task
+        const query = this.createQueryBuilder('task').leftJoinAndSelect("task.taskCategory", "task_category")
         //only task of user logged
         query.where({ user });
 
@@ -56,6 +57,7 @@ export class TasksRepository extends Repository<Task> {
 
         try {
             const tasks = await query.getMany();
+            console.log(tasks);
             return tasks;
         } catch (error) {
             this.logger.error(`Fail get task for user: "${user.username}",
